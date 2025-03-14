@@ -68,9 +68,108 @@ If we want to apply cloc to the src directory
 cloc ./src/
 ```
 
+Install solidity metrics tintinweb in vscode
+
+Once solidity metrics is installed, right click to for example in "src" directory and run Solidity:metrics and it will give you the solidity report.
+
+Then with ctrl + shift + p + export and we will be able to see in its own file like html
 
 
-## Time to start looking at the codebase
+
+
+# Time to start looking at the codebase
+
+### About the project in my words
+
+A user should be able to set a password, and retrieve it. Other users should no be able to see my password
+
+
+### Patrick collins uses this:
+// n (for a note)
+// q (for a question)
+// @audit-i (audit for informational)
+// i (for informational finding )
+
+Patrick also works with a cool packed called headers which allows to write really nice headers 
+
+### After studying the protocol
+
+Create a folder "audit-data" and a file called finding_layout.md
+
+```shell
+mkdir audit-data && echo > finding_layout.md
+```
+
+The content of the finding_layout.md is like this
+
+```shell
+### [S-#] TITLE (Root Cause + Impact)
+
+**Description:**
+
+**Impact:**
+
+**Proof of Concept:**
+
+**Recommended Mitigation:**
+```
+
+Create another file in audit-data called findings.md
+
+```shell
+touch findings.md
+```
+
+For proof of concept, we have to run anvil to get a local running blockchain
+```shell
+anvil
+```
+
+Then we need to deploy on this locally running anvil blockchain. So we have to run the deployment script, and luckily for us we just need to type make deploy 
+```shell
+make deploy
+```
+
+Foundry has something call cast (copy and paste the address obtained above)
+```
+cast storage 0x5FbDB2315678afecb367f032d93F642f64180aa3
+
+And we get this output:
+╭------------+---------+------+--------+-------+-------------------------------------------------------------------------------+--------------------------------------------------------------------+-------------------------------------╮
+| Name       | Type    | Slot | Offset | Bytes | Value                                                                         | Hex Value                                                          | Contract                            |
++=========================================================================================================================================================================================================================================+
+| s_owner    | address | 0    | 0      | 20    | 1390849295786071768276380950238675083608645509734                             | 0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266 | src/PasswordStore.sol:PasswordStore |
+|------------+---------+------+--------+-------+-------------------------------------------------------------------------------+--------------------------------------------------------------------+-------------------------------------|
+| s_password | string  | 1    | 0      | 32    | 49516443757395204518384437876896412918898210405993719258753982441762571943956 | 0x6d7950617373776f726400000000000000000000000000000000000000000014 | src/PasswordStore.sol:PasswordStore |
+╰------------+---------+------+--------+-------+-------------------------------------------------------------------------------+--------------------------------------------------------------------+-------------------------------------╯
+
+```
+
+```shell
+cast storage 0x5FbDB2315678afecb367f032d93F642f64180aa3 1 --rpc-url http://127.0.0.1:8545
+```
+
+"1" is because we are interested in slot 1
+
+And we get this output:
+
+0x6d7950617373776f726400000000000000000000000000000000000000000014
+
+This is the binary representation of the value of the variable.
+
+This means that if we run
+
+```shell
+cast parse-bytes32-string 0x6d7950617373776f726400000000000000000000000000000000000000000014
+```
+
+we get back: myPassword
+
+### To explain about severity of a bug we will rely on docs.codehawks.com
+
+Go to How to Evaluate a Finding Severity
+
+
 
 
 
